@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Portfolio</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/grid.css">
+</head>
+<body>
+    <header class="main-header">
+        <h1>taramoves</h1>
+        <nav class="main-nav">
+            <ul>
+                <li><a href="#">art</a></li>
+                <li><a href="#">client work</a></li>
+                <li><a href="#">writing</a></li>
+                <li><a href="#">upcoming</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <div class="projects-grid" id="projectsContainer"></div>
+    </main>
+
+    <div id="projectModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <div class="modal-body">
+                <img class="modal-image" src="" alt="">
+                <div class="modal-info">
+                    <h2 class="modal-title"></h2>
+                    <div class="modal-subheading"></div>
+                    <p class="modal-description"></p>
+                    <div class="modal-tags"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/airtable.js"></script>
+    <script src="js/grid.js"></script>
+</body>
+</html>
