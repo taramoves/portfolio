@@ -28,7 +28,6 @@ h1 {
     background: white;
     padding: 10px 20px;
     display: flex;
-    justify-content: space-between;
     align-items: center;
     border-bottom: 1px solid #000;
     z-index: 1000;
@@ -38,6 +37,11 @@ h1 {
     margin: 0;
     font-size: 1.5rem;
     font-weight: normal;
+    flex-shrink: 0;
+}
+
+.main-nav {
+    margin-left: auto;
 }
 
 .main-nav ul {
@@ -53,6 +57,14 @@ h1 {
     color: #333;
     font-size: 0.9rem;
     text-transform: lowercase;
+    padding: 5px 10px;
+    border-bottom: 2px solid transparent;
+    transition: border-color 0.3s ease;
+}
+
+.main-nav a:hover,
+.main-nav a.active {
+    border-bottom-color: #000;
 }
 
 main {
@@ -125,4 +137,36 @@ main {
     display: flex;
     flex-wrap: wrap;
     gap: 5px;
+}
+
+.view-toggle {
+    display: flex;
+    margin-left: 20px;
+}
+
+.view-toggle button {
+    background: none;
+    border: 1px solid #ccc;
+    padding: 5px 12px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.view-toggle button:first-child {
+    border-top-left-radius: 3px;
+    border-bottom-left-radius: 3px;
+    border-right: none;
+}
+
+.view-toggle button:last-child {
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
+}
+
+.view-toggle button.active {
+    background: #000;
+    color: white;
+    border-color: #000;
 }

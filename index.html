@@ -6,21 +6,31 @@
     <title>My Portfolio</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/grid.css">
+    <link rel="stylesheet" href="css/list.css">
 </head>
 <body>
     <header class="main-header">
         <h1>taramoves</h1>
         <nav class="main-nav">
             <ul>
-                <li><a href="#">art</a></li>
-                <li><a href="#">client work</a></li>
-                <li><a href="#">writing</a></li>
-                <li><a href="#">upcoming</a></li>
+                <li><a href="#new-media" data-filter="new-media">new media</a></li>
+                <li><a href="#design" data-filter="design">design</a></li>
+                <li><a href="#workshops" data-filter="workshops">workshops</a></li>
+                <li><a href="#writing" data-filter="writing">writing</a></li>
+                <li><a href="#upcoming" data-filter="upcoming">upcoming</a></li>
+                <li><a href="#all" data-filter="all">all</a></li>
+                <li><a href="#about" data-filter="about">about</a></li>
             </ul>
         </nav>
+        <div class="view-toggle">
+            <button id="gridViewBtn" class="active">Grid</button>
+            <button id="listViewBtn">List</button>
+        </div>
     </header>
     <main>
-        <div class="projects-grid" id="projectsContainer"></div>
+        <div class="projects-grid" id="projectsContainer">
+            <p>Loading projects... If this message persists, there might be an issue with the data connection.</p>
+        </div>
     </main>
 
     <div id="projectModal" class="modal">
@@ -39,6 +49,9 @@
     </div>
 
     <script src="js/airtable.js"></script>
+    <script src="js/airtable-test.js"></script>
     <script src="js/grid.js"></script>
+    <script src="js/list.js"></script>
+    <script src="js/view-switcher.js"></script>
 </body>
 </html>
