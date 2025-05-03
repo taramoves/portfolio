@@ -205,12 +205,19 @@ function renderProjectGroup(projects) {
         if (fields.Dimensions) subheadingInfo.push(fields.Dimensions);
         const subheadingText = subheadingInfo.join(' | ');
         
+        // Add Project URL if available
+        let projectUrlHtml = '';
+        if (fields['Project URL']) {
+            projectUrlHtml = `<div class="project-link"><a href="${fields['Project URL']}" target="_blank" rel="noopener noreferrer">Link</a></div>`;
+        }
+        
         projectCard.innerHTML = `
             <img src="${fields['Main Image'][0].url}" alt="${fields.Title}" class="project-image">
             <div class="project-info">
                 <h3>${fields.Title || 'Untitled Project'}</h3>
                 ${subheadingText ? `<div class="subheading">${subheadingText}</div>` : ''}
                 <p>${fields.Description || ''}</p>
+                ${projectUrlHtml}
                 ${tagsHTML ? `<div class="project-tags">${tagsHTML}</div>` : ''}
             </div>
         `;
@@ -248,23 +255,12 @@ function renderProjects(projects) {
             ? fields.Tags.map(tag => `<span class="tag">${tag}</span>`).join('')
             : '';
 
-        // Format date information
+        // Format date information - show only year
         let dateDisplay = '';
         if (fields.Date) {
             const projectDate = new Date(fields.Date);
-            const today = new Date();
-            
-            if (projectDate > today) {
-                // Future date - show full date
-                dateDisplay = projectDate.toLocaleDateString('en-US', { 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric' 
-                });
-            } else {
-                // Past date - show just the year
-                dateDisplay = projectDate.getFullYear().toString();
-            }
+            // Always show just the year, even for future dates
+            dateDisplay = projectDate.getFullYear().toString();
         } else if (fields.Year) {
             // If no specific date but a year is provided
             dateDisplay = fields.Year;
@@ -277,12 +273,19 @@ function renderProjects(projects) {
         if (fields.Dimensions) subheadingInfo.push(fields.Dimensions);
         const subheadingText = subheadingInfo.join(' | ');
         
+        // Add Project URL if available
+        let projectUrlHtml = '';
+        if (fields['Project URL']) {
+            projectUrlHtml = `<div class="project-link"><a href="${fields['Project URL']}" target="_blank" rel="noopener noreferrer">Link</a></div>`;
+        }
+        
         projectCard.innerHTML = `
             <img src="${fields['Main Image'][0].url}" alt="${fields.Title}" class="project-image">
             <div class="project-info">
                 <h3>${fields.Title || 'Untitled Project'}</h3>
                 ${subheadingText ? `<div class="subheading">${subheadingText}</div>` : ''}
                 <p>${fields.Description || ''}</p>
+                ${projectUrlHtml}
                 ${tagsHTML ? `<div class="project-tags">${tagsHTML}</div>` : ''}
             </div>
         `;
@@ -321,23 +324,12 @@ function setupModal() {
             if (projectData) {
                 const fields = projectData.fields;
                 
-                // Format date information for the modal
+                // Format date information for the modal - show only year
                 let dateDisplay = '';
                 if (fields.Date) {
                     const projectDate = new Date(fields.Date);
-                    const today = new Date();
-                    
-                    if (projectDate > today) {
-                        // Future date - show full date
-                        dateDisplay = projectDate.toLocaleDateString('en-US', { 
-                            year: 'numeric', 
-                            month: 'long', 
-                            day: 'numeric' 
-                        });
-                    } else {
-                        // Past date - show just the year
-                        dateDisplay = projectDate.getFullYear().toString();
-                    }
+                    // Always show just the year, even for future dates
+                    dateDisplay = projectDate.getFullYear().toString();
                 } else if (fields.Year) {
                     // If no specific date but a year is provided
                     dateDisplay = fields.Year;
@@ -361,11 +353,108 @@ function setupModal() {
                     modal.querySelector('.modal-subheading').textContent = subheadingText;
                     modal.querySelector('.modal-description').textContent = fields.Description || '';
                     
+                    // Handle link field if available
+                    const linkContainer = modal.querySelector('.modal-link');
+                    linkContainer.innerHTML = '';
+                    if (fields['Project URL']) {
+                        const link = document.createElement('a');
+                        link.href = fields['Project URL'];
+                        link.textContent = 'Link';
+                        link.target = '_blank';
+                        link.rel = 'noopener noreferrer';
+                        linkContainer.appendChild(link);
+                    } else if (fields.Link) {
+                        // For backward compatibility
+                        const link = document.createElement('a');
+                        link.href = fields.Link;
+                        link.textContent = fields.LinkText || 'View Project';
+                        link.target = '_blank';
+                        link.rel = 'noopener noreferrer';
+                        linkContainer.appendChild(link);
+                    }
+                    
+                    // Handle video embed if available
+                    const videoContainer = modal.querySelector('.modal-video');
+                    videoContainer.innerHTML = '';
+                    
+                    // Only use the Video column, not alternate field names
+                    const videoUrl = fields.Video || '';
+                    
+                    // Only try to embed if there's a video URL and it's from YouTube or Vimeo
+                    if (videoUrl) {
+                        // Check if it's YouTube
+                        if (videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be')) {
+                            // Extract video ID from YouTube URL
+                            let videoId = '';
+                            if (videoUrl.includes('youtube.com/watch?v=')) {
+                                videoId = new URL(videoUrl).searchParams.get('v');
+                            } else if (videoUrl.includes('youtu.be/')) {
+                                videoId = videoUrl.split('youtu.be/')[1].split('?')[0];
+                            } else if (videoUrl.includes('youtube.com/embed/')) {
+                                videoId = videoUrl.split('youtube.com/embed/')[1].split('?')[0];
+                            }
+                            
+                            if (videoId) {
+                                const iframe = document.createElement('iframe');
+                                iframe.width = '100%';
+                                iframe.height = '315';
+                                iframe.src = `https://www.youtube.com/embed/${videoId}`;
+                                iframe.title = fields.Title || 'Video';
+                                iframe.frameBorder = '0';
+                                iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+                                iframe.allowFullscreen = true;
+                                videoContainer.appendChild(iframe);
+                            }
+                        } 
+                        // Check if it's Vimeo
+                        else if (videoUrl.includes('vimeo.com')) {
+                            // Extract video ID from Vimeo URL
+                            const vimeoId = videoUrl.split('vimeo.com/')[1].split('?')[0].split('/')[0];
+                            
+                            if (vimeoId) {
+                                const iframe = document.createElement('iframe');
+                                iframe.width = '100%';
+                                iframe.height = '315';
+                                iframe.src = `https://player.vimeo.com/video/${vimeoId}`;
+                                iframe.title = fields.Title || 'Video';
+                                iframe.frameBorder = '0';
+                                iframe.allow = 'autoplay; fullscreen; picture-in-picture';
+                                iframe.allowFullscreen = true;
+                                videoContainer.appendChild(iframe);
+                            }
+                        }
+                    }
+                    
                     // Handle tags - they could be in different containers
                     const tagsHTML = fields.Tags && Array.isArray(fields.Tags) 
                         ? fields.Tags.map(tag => `<span class="tag">${tag}</span>`).join('')
                         : '';
                     modal.querySelector('.modal-tags').innerHTML = tagsHTML;
+                    
+                    // Handle additional images
+                    const additionalImagesContainer = modal.querySelector('.modal-additional-images');
+                    additionalImagesContainer.innerHTML = ''; // Clear previous images
+                    
+                    // Check if there are multiple images
+                    if (fields['Main Image'] && fields['Main Image'].length > 1) {
+                        // Skip the first image (it's already shown at the top)
+                        for (let i = 1; i < fields['Main Image'].length; i++) {
+                            const img = document.createElement('img');
+                            img.src = fields['Main Image'][i].url;
+                            img.alt = `${fields.Title || 'Project'} - Image ${i+1}`;
+                            additionalImagesContainer.appendChild(img);
+                        }
+                    }
+                    
+                    // Check if there are additional image fields
+                    if (fields['Additional Images'] && Array.isArray(fields['Additional Images']) && fields['Additional Images'].length > 0) {
+                        fields['Additional Images'].forEach((imgData, index) => {
+                            const img = document.createElement('img');
+                            img.src = imgData.url;
+                            img.alt = `${fields.Title || 'Project'} - Additional Image ${index+1}`;
+                            additionalImagesContainer.appendChild(img);
+                        });
+                    }
                     
                     // Show modal
                     modal.style.display = 'block';

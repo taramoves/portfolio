@@ -27,23 +27,12 @@ function renderProjectsList(projects) {
             ? fields.Tags.map(tag => `<span class="tag">${tag}</span>`).join('')
             : '';
 
-        // Format date information
+        // Format date information - show only year
         let dateDisplay = '';
         if (fields.Date) {
             const projectDate = new Date(fields.Date);
-            const today = new Date();
-            
-            if (projectDate > today) {
-                // Future date - show full date
-                dateDisplay = projectDate.toLocaleDateString('en-US', { 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric' 
-                });
-            } else {
-                // Past date - show just the year
-                dateDisplay = projectDate.getFullYear().toString();
-            }
+            // Always show just the year, even for future dates
+            dateDisplay = projectDate.getFullYear().toString();
         } else if (fields.Year) {
             // If no specific date but a year is provided
             dateDisplay = fields.Year;
@@ -56,12 +45,19 @@ function renderProjectsList(projects) {
         if (fields.Dimensions) subheadingInfo.push(fields.Dimensions);
         const subheadingText = subheadingInfo.join(' | ');
         
+        // Add Project URL if available
+        let projectUrlHtml = '';
+        if (fields['Project URL']) {
+            projectUrlHtml = `<div class="project-link"><a href="${fields['Project URL']}" target="_blank" rel="noopener noreferrer">Link</a></div>`;
+        }
+        
         projectItem.innerHTML = `
             <img src="${fields['Main Image'][0].url}" alt="${fields.Title}" class="project-list-image">
             <div class="project-list-info">
                 <h3>${fields.Title || 'Untitled Project'}</h3>
                 ${subheadingText ? `<div class="subheading">${subheadingText}</div>` : ''}
                 <p>${fields.Description || ''}</p>
+                ${projectUrlHtml}
                 ${tagsHTML ? `<div class="project-list-tags">${tagsHTML}</div>` : ''}
             </div>
         `;
@@ -89,23 +85,12 @@ function renderProjectGroupList(projects) {
             ? fields.Tags.map(tag => `<span class="tag">${tag}</span>`).join('')
             : '';
 
-        // Format date information
+        // Format date information - show only year
         let dateDisplay = '';
         if (fields.Date) {
             const projectDate = new Date(fields.Date);
-            const today = new Date();
-            
-            if (projectDate > today) {
-                // Future date - show full date
-                dateDisplay = projectDate.toLocaleDateString('en-US', { 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric' 
-                });
-            } else {
-                // Past date - show just the year
-                dateDisplay = projectDate.getFullYear().toString();
-            }
+            // Always show just the year, even for future dates
+            dateDisplay = projectDate.getFullYear().toString();
         } else if (fields.Year) {
             // If no specific date but a year is provided
             dateDisplay = fields.Year;
@@ -118,12 +103,19 @@ function renderProjectGroupList(projects) {
         if (fields.Dimensions) subheadingInfo.push(fields.Dimensions);
         const subheadingText = subheadingInfo.join(' | ');
         
+        // Add Project URL if available
+        let projectUrlHtml = '';
+        if (fields['Project URL']) {
+            projectUrlHtml = `<div class="project-link"><a href="${fields['Project URL']}" target="_blank" rel="noopener noreferrer">Link</a></div>`;
+        }
+        
         projectItem.innerHTML = `
             <img src="${fields['Main Image'][0].url}" alt="${fields.Title}" class="project-list-image">
             <div class="project-list-info">
                 <h3>${fields.Title || 'Untitled Project'}</h3>
                 ${subheadingText ? `<div class="subheading">${subheadingText}</div>` : ''}
                 <p>${fields.Description || ''}</p>
+                ${projectUrlHtml}
                 ${tagsHTML ? `<div class="project-list-tags">${tagsHTML}</div>` : ''}
             </div>
         `;
