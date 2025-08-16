@@ -44,6 +44,11 @@ function updateViewButtons() {
     const gridViewBtn = document.getElementById('gridViewBtn');
     const listViewBtn = document.getElementById('listViewBtn');
     
+    // Guard against missing buttons in DOM (production may not include them)
+    if (!gridViewBtn || !listViewBtn) {
+        return;
+    }
+
     if (window.currentView === 'grid') {
         gridViewBtn.classList.add('active');
         listViewBtn.classList.remove('active');

@@ -30,6 +30,13 @@ function renderProjectsList(projects) {
         return; // Skip rendering if it's already handled (like in new-media case with custom handling)
     }
     
+    // Guard against undefined or non-array input
+    if (!Array.isArray(projects)) {
+        container.innerHTML = '<p>No projects found in this category.</p>';
+        container.className = 'projects-list';
+        return;
+    }
+    
     container.innerHTML = ''; // Clear existing content
     container.className = 'projects-list'; // Change to list layout
     
@@ -54,9 +61,17 @@ function renderProjectsList(projects) {
             return;
         }
         
-        // Only show projects with Display checkbox checked
-        if (!fields.Display) {
-            console.log('🔍 Skipping project without Display checkbox:', fields.Title);
+        // Only show projects explicitly marked for display OR tagged as Portfolio
+        const hasDisplayField = Object.prototype.hasOwnProperty.call(fields, 'Display');
+        const isMarkedForDisplay = fields.Display === true || fields.Display === 'true' || fields.Display === 1;
+        const isPortfolioTagged = Array.isArray(fields.Tags) && fields.Tags.includes('Portfolio');
+        if (hasDisplayField) {
+            if (!isMarkedForDisplay && !isPortfolioTagged) {
+                console.log('🔍 Skipping project (Display not checked and not Portfolio tag):', fields.Title);
+                return;
+            }
+        } else if (!isPortfolioTagged) {
+            console.log('🔍 Skipping project (no Display field and not Portfolio tag):', fields.Title);
             return;
         }
         

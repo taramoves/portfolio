@@ -34,6 +34,15 @@ function loadFromEnv() {
 // Load from local config file (for client-side development)
 async function loadFromLocalConfig() {
     try {
+        // Skip fetching local config in production environments
+        if (typeof window !== 'undefined') {
+            const host = window.location.hostname;
+            const isLocalhost = host === 'localhost' || host === '127.0.0.1' || host.endsWith('.local');
+            if (!isLocalhost) {
+                return null;
+            }
+        }
+
         const response = await fetch('config/env.local');
         if (!response.ok) throw new Error('Config file not found');
         
