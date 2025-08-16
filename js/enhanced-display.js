@@ -6,6 +6,36 @@ async function showEnhancedProjectModal(projectId) {
     const modal = document.getElementById('projectModal');
     
     try {
+        // Skip extra Airtable calls for sample fallback project
+        if (projectId && String(projectId).startsWith('sample')) {
+            const projectData = (window.projects || []).find(p => p.id === projectId);
+            if (!projectData) return;
+            const fields = projectData.fields;
+            const modalImage = modal.querySelector('.modal-image');
+            if (fields['Main Image']?.[0]?.url) {
+                modalImage.src = fields['Main Image'][0].url;
+                modalImage.style.display = 'block';
+            } else {
+                modalImage.style.display = 'none';
+            }
+            modal.querySelector('.modal-title').textContent = fields.Title || 'Untitled Project';
+            const subheadingInfo = [];
+            const year = fields.Year || (fields.Date ? new Date(fields.Date).getFullYear() : '');
+            const medium = fields['Primary Medium'] || fields.Medium || '';
+            const dimensions = fields.Dimensions || fields['Space Requirements'] || '';
+            if (year) subheadingInfo.push(year);
+            if (medium) subheadingInfo.push(medium);
+            if (dimensions) subheadingInfo.push(dimensions);
+            modal.querySelector('.modal-subheading').textContent = subheadingInfo.join(' | ');
+            const description = fields['Project Statement'] || fields.Description || '';
+            modal.querySelector('.modal-description').textContent = description;
+            // Clear optional sections for sample
+            const clearSel = ['.modal-additional-images', '.modal-exhibitions', '.modal-collaborators', '.modal-workshops', '.modal-video', '.modal-link', '.modal-tags'];
+            clearSel.forEach(sel => { const el = modal.querySelector(sel); if (el) el.innerHTML = ''; });
+            modal.style.display = 'block';
+            return;
+        }
+
         // Fetch all related data in parallel for better performance
         const [projectData, mediaAssets, exhibitions, collaborators, workshops] = await Promise.all([
             fetchProjects().then(data => data.records.find(p => p.id === projectId)),

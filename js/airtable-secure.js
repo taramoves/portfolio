@@ -12,22 +12,33 @@ async function initAirtableConfig() {
     return AIRTABLE_CONFIG;
 }
 
-// Helper function for Airtable requests (updated to use secure config)
+// Helper function for Airtable requests (updated for production proxy)
 async function fetchAirtableDataSecure({ table, view, filterByFormula = '' }) {
-    // Ensure config is loaded
+    // In production, use serverless proxy with server-side env vars
+    const isBrowser = typeof window !== 'undefined';
+    const isProd = isBrowser && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' && !window.location.hostname.endsWith('.local');
+
+    if (isProd) {
+        const url = new URL('/api/airtable', window.location.origin);
+        if (table) url.searchParams.append('table', table);
+        if (view) url.searchParams.append('view', view);
+        if (filterByFormula) url.searchParams.append('filterByFormula', filterByFormula);
+        const response = await fetch(url.toString());
+        if (!response.ok) throw new Error(`Airtable fetch failed: ${response.status}`);
+        return await response.json();
+    }
+
+    // Local dev: use direct Airtable with local config
     await initAirtableConfig();
-    
     const url = new URL(`https://api.airtable.com/v0/${AIRTABLE_CONFIG.BASE_ID}/${table}`);
     if (view) url.searchParams.append('view', view);
     if (filterByFormula) url.searchParams.append('filterByFormula', filterByFormula);
-
     const response = await fetch(url, {
         headers: {
             'Authorization': `Bearer ${AIRTABLE_CONFIG.ACCESS_TOKEN}`,
             'Content-Type': 'application/json'
         }
     });
-    
     if (!response.ok) throw new Error(`Airtable fetch failed: ${response.status}`);
     return await response.json();
 }
