@@ -7,29 +7,35 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/grid.css">
     <link rel="stylesheet" href="css/list.css">
+    <link rel="stylesheet" href="css/about.css">
+    <link rel="stylesheet" href="css/enhanced-modal.css">
+    <link rel="stylesheet" href="css/homepage.css">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 </head>
 <body>
     <header class="main-header">
         <h1>taramoves</h1>
         <nav class="main-nav">
             <ul>
-                <li><a href="#new-media" data-filter="new-media">new media</a></li>
-                <li><a href="#design" data-filter="design">design</a></li>
-                <li><a href="#workshops" data-filter="workshops">workshops</a></li>
-                <li><a href="#writing" data-filter="writing">writing</a></li>
-                <li><a href="#upcoming" data-filter="upcoming">upcoming</a></li>
-                <li><a href="#all" data-filter="all">all</a></li>
+                <li><a href="#home" data-filter="home" class="nav-home">home</a></li>
+                <li><a href="#portfolio" data-filter="portfolio">portfolio</a></li>
                 <li><a href="#about" data-filter="about">about</a></li>
             </ul>
         </nav>
-        <div class="view-toggle">
-            <button id="gridViewBtn" class="active">Grid</button>
-            <button id="listViewBtn">List</button>
-        </div>
+
     </header>
     <main>
-        <div class="projects-grid" id="projectsContainer">
-            <p>Loading projects... If this message persists, there might be an issue with the data connection.</p>
+        <div class="homepage" id="projectsContainer">
+            <div class="hero-section">
+                <div class="hero-content">
+                    <div class="hero-actions">
+                        <a href="#portfolio" class="cta-button primary">Portfolio</a>
+                        <a href="#about" class="cta-button secondary">About</a>
+                    </div>
+                </div>
+            </div>
         </div>
     </main>
 
@@ -37,15 +43,15 @@
         <div class="modal-content">
             <span class="close-button">&times;</span>
             <div class="modal-body">
-                <img class="modal-image" src="" alt="">
+                <div class="modal-video"></div>
                 <div class="modal-info">
                     <h2 class="modal-title"></h2>
                     <div class="modal-subheading"></div>
                     <p class="modal-description"></p>
                     <div class="modal-link"></div>
-                    <div class="modal-video"></div>
                     <div class="modal-tags"></div>
                 </div>
+                <img class="modal-image" src="" alt="">
             </div>
             <div class="modal-additional-images">
                 <!-- Additional images will be added here dynamically -->
@@ -53,8 +59,14 @@
         </div>
     </div>
 
-    <script src="js/airtable.js"></script>
-    <script src="js/airtable-test.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/airtable-secure.js"></script>
+    <script src="js/enhanced-display.js"></script>
+    <script src="js/enhanced-filtering.js"></script>
+    <script src="js/search.js"></script>
+    <script src="js/homepage.js"></script>
+    <script src="js/about-data.js"></script>
+    <script src="js/about.js"></script>
     <script src="js/grid.js"></script>
     <script src="js/list.js"></script>
     <script src="js/view-switcher.js"></script>

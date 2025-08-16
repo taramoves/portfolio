@@ -5,6 +5,7 @@ body {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0;
+    cursor: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTkuOTM3IDQuMzU4QTIgMiAwIDAgMSAxMiA0VjJBNCuMDI1IDQuMDI1IDAgMCAwIDkuMzM0IDEuNjcyTDkuMzM3IDRaIiBmaWxsPSIjMDAwIi8+CjxwYXRoIGQ9Ik05LjMzNyA0LjM1OEwyIDEuNjcyTDQuMzU4IDkuMzM3IDEyIDRWMloiIGZpbGw9IiMwMDAiLz4KPHBhdGggZD0iTTkuOTM3IDQuMzU4QTIgMiAwIDAgMSAxMiA0VjJBNC4wMjUgNC4wMjUgMCAwIDAgOS4zMzQgMS42NzJMOS4zMzcgNFoiIGZpbGw9IiMwMDAiLz4KPC9zdmc+Cg==') 12 12, auto;
 }
 
 h1 {
@@ -103,23 +104,23 @@ main {
 
 .modal-body {
     display: flex;
-    flex-wrap: wrap;
-    gap: 30px;
+    flex-direction: column;
+    gap: 20px;
     margin-top: 20px;
 }
 
 .modal-image {
-    width: 50%;
-    max-width: 600px;
+    width: 100%;
+    max-width: 800px;
     height: auto;
     object-fit: contain;
-    align-self: flex-start;
+    margin: 0 auto;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
 .modal-info {
-    width: calc(50% - 30px);
-    flex: 1;
-    min-width: 300px;
+    width: 100%;
 }
 
 .modal-title {
@@ -205,6 +206,54 @@ main {
     border-color: #000;
 }
 
+.header-controls {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-left: 20px;
+}
+
+.search-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.search-input {
+    padding: 6px 30px 6px 12px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    font-size: 0.9rem;
+    width: 200px;
+    transition: border-color 0.3s ease, width 0.3s ease;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: #000;
+    width: 250px;
+}
+
+.search-clear {
+    position: absolute;
+    right: 8px;
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: #666;
+    padding: 0;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.search-clear:hover {
+    color: #000;
+}
+
 .modal-additional-images {
     margin-top: 30px;
     display: flex;
@@ -222,6 +271,23 @@ main {
 
 /* Media query for mobile devices */
 @media screen and (max-width: 768px) {
+    .main-header {
+        padding: 10px 15px;
+    }
+    
+    .main-header h1 {
+        font-size: 1.3rem;
+    }
+    
+    .main-nav ul {
+        gap: 15px;
+    }
+    
+    .main-nav a {
+        font-size: 0.85rem;
+        padding: 5px 8px;
+    }
+    
     .modal-body {
         flex-direction: column;
     }
@@ -240,12 +306,58 @@ main {
     .modal-video iframe {
         height: 240px;
     }
-    
-    .main-nav {
-        display: none;
     }
     
-    .main-header {
-        justify-content: space-between;
+    .search-input:focus {
+        width: 180px;
     }
+}
+
+.search-no-results {
+    text-align: center;
+    padding: 60px 20px;
+    color: #666;
+}
+
+.search-no-results p {
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+}
+
+.search-clear-btn {
+    background: #000;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.3s ease;
+}
+
+.search-clear-btn:hover {
+    background: #333;
+}
+
+.search-results {
+    margin-top: 20px;
+}
+
+/* Hide header controls on homepage */
+.homepage .header-controls {
+    display: none;
+}
+
+/* Remove custom cursors for now - they weren't displaying correctly */
+
+/* Read More styling */
+.read-more {
+    font-size: 0.85rem;
+    color: #666;
+    margin: 5px 0 0 0;
+    transition: color 0.2s ease;
+}
+
+.read-more:hover {
+    color: #000;
 }

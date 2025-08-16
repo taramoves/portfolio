@@ -2,53 +2,40 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('View switcher loaded');
 
     try {
-        // Initialize view preference from localStorage or default to grid
-        window.currentView = localStorage.getItem('viewPreference') || 'grid';
+        // Force list view only
+        window.currentView = 'list';
         updateViewButtons();
         
-        // Set up view toggle buttons
-        const gridViewBtn = document.getElementById('gridViewBtn');
-        const listViewBtn = document.getElementById('listViewBtn');
-        
-        if (gridViewBtn && listViewBtn) {
-            gridViewBtn.addEventListener('click', () => {
-                setView('grid');
-            });
-            
-            listViewBtn.addEventListener('click', () => {
-                setView('list');
-            });
-        } else {
-            console.error('View toggle buttons not found');
-        }
+        // View toggle buttons removed - list view only
 
         // Set up initial navigation with the current view
         setupNavigationWithViewSwitcher();
         
-        // Wait a moment to make sure grid.js has loaded
-        setTimeout(() => {
-            // Handle initial page load based on hash
-            const initialFilter = window.location.hash.slice(1) || 'all';
-            
-            // Make sure window.projects exists before using applyFilterWithCurrentView
-            if (window.projects) {
+        // Wait for projects to be loaded, then apply initial filter
+        const waitForProjects = () => {
+            if (window.projects && window.projects.length > 0) {
+                // Handle initial page load based on hash
+                const initialFilter = window.location.hash.slice(1) || 'home';
                 console.log('Applying initial filter:', initialFilter);
+                console.log('🔍 Available projects for filtering:', window.projects.length);
                 applyFilterWithCurrentView(initialFilter);
             } else {
-                console.warn('Projects data not available yet');
+                console.log('🔍 Waiting for projects to load...');
+                setTimeout(waitForProjects, 200);
             }
-        }, 500);
+        };
+        
+        setTimeout(waitForProjects, 100);
     } catch (error) {
         console.error('Error in view-switcher initialization:', error);
     }
 });
 
 function setView(viewType) {
-    window.currentView = viewType;
-    localStorage.setItem('viewPreference', viewType);
-    updateViewButtons();
+    // Force list view only
+    window.currentView = 'list';
     
-    // Re-render the current category in the new view
+    // Re-render the current category in list view
     const currentFilter = window.location.hash.slice(1) || 'all';
     applyFilterWithCurrentView(currentFilter);
 }
@@ -67,7 +54,23 @@ function updateViewButtons() {
 }
 
 function applyFilterWithCurrentView(filter) {
-    if (filter === 'new-media' && window.currentView === 'list') {
+    console.log('🔍 applyFilterWithCurrentView called with:', filter, 'view:', window.currentView);
+    
+    if (filter === 'home' || filter === '') {
+        // Show homepage
+        renderHomepage();
+        updateActiveNavigation('home');
+    } else if (filter === 'portfolio') {
+        // Show all projects in portfolio
+        showPortfolio();
+        updateActiveNavigation('portfolio');
+    } else if (filter === 'about') {
+        // About page works the same in both views
+        loadAboutContent().then(content => {
+            renderAboutPage(content);
+        });
+        updateActiveNavigation('about');
+    } else if (filter === 'new-media' && window.currentView === 'list') {
         // Special handling for new-media in list view
         renderNewMediaListView();
     } else if (filter === 'new-media' && window.currentView === 'grid') {
@@ -78,11 +81,14 @@ function applyFilterWithCurrentView(filter) {
     } else {
         // For all other categories, use the appropriate view renderer
         const filteredProjects = filterProjects(filter);
+        console.log('🔍 Filtered projects:', filteredProjects?.length || 0);
         
         if (window.currentView === 'list') {
+            console.log('🔍 Rendering in list view');
             renderProjectsList(filteredProjects);
         } else {
             // Reset to projects-grid class and render in grid view
+            console.log('🔍 Rendering in grid view');
             const container = document.getElementById('projectsContainer');
             container.className = 'projects-grid';
             renderProjects(filteredProjects);
@@ -109,8 +115,18 @@ function setupNavigationWithViewSwitcher() {
             
             // Use the view switcher to apply the filter with current view
             applyFilterWithCurrentView(filter);
+            updateActiveNavigation(filter);
         });
     });
     
     console.log('Navigation set up by view-switcher.js');
+}
+
+function updateActiveNavigation(filter) {
+    document.querySelectorAll('.main-nav a').forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('data-filter') === filter) {
+            link.classList.add('active');
+        }
+    });
 } 

@@ -1,0 +1,6 @@
+Asset Name,Linked Project,Asset Type,Media Format,Priority Level,Caption,Alt Text,Platform,External URL,Duration,File Size,Display Context
+"Hero Installation Shot","Sample Installation","Artwork","Photo","Hero","Wide shot showing the full installation space with participants interacting","Installation view with multiple people engaging with interactive projections","Airtable","","","2.3MB","Grid View,Detail Page"
+"Process Documentation","Sample Installation","Process","Photo","Supporting","Behind-the-scenes photo showing technical setup","Artist adjusting projection equipment in gallery space","Airtable","","","1.8MB","Detail Page,Archive"
+"Performance Video","Performance Documentation","Artwork","Video","Hero","Full documentation of the 45-minute performance","Complete performance documentation showing movement and generated visuals","Vimeo","https://vimeo.com/sample","45:32","","Grid View,Detail Page"
+"User Interface Screenshot","Web-based Interactive","Documentation","Screenshot","Primary","Screenshot of the web interface in use","Browser screenshot showing the interactive text generation interface","Website","","","450KB","Detail Page"
+"Technical Diagram","Sample Installation","Technical","PDF","Archive","Wiring diagram for sensor setup","Technical schematic showing Arduino connections and sensor placement","Airtable","","","2.1MB","Archive" 

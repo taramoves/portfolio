@@ -1,3 +1,28 @@
+// Format duration from seconds to "X Minutes" format
+function formatDuration(duration) {
+    // Convert string to number if it's a string number
+    let totalSeconds;
+    if (typeof duration === 'string' && /^\d+$/.test(duration)) {
+        totalSeconds = parseInt(duration);
+    } else if (typeof duration === 'number') {
+        totalSeconds = Math.floor(duration);
+    } else if (typeof duration === 'string') {
+        // If it's already formatted, return as is
+        return duration;
+    } else {
+        return duration;
+    }
+    
+    const minutes = Math.floor(totalSeconds / 60);
+    
+    if (minutes >= 1) {
+        return minutes === 1 ? `${minutes} Minute` : `${minutes} Minutes`;
+    } else {
+        // For durations under a minute, show seconds
+        return totalSeconds === 1 ? `${totalSeconds} Second` : `${totalSeconds} Seconds`;
+    }
+}
+
 function renderProjectsList(projects) {
     const container = document.getElementById('projectsContainer');
     
@@ -13,9 +38,32 @@ function renderProjectsList(projects) {
         return;
     }
     
-    projects.forEach(project => {
+    // Sort projects in reverse chronological order (newest first)
+    const sortedProjects = [...projects].sort((a, b) => {
+        const dateA = new Date(a.fields.Date || a.fields.Year || 0);
+        const dateB = new Date(b.fields.Date || b.fields.Year || 0);
+        return dateB - dateA;
+    });
+    
+    sortedProjects.forEach(project => {
         const fields = project.fields;
-        if (!fields['Main Image']?.[0]) return;
+        
+        // Skip projects without titles, but allow projects without images
+        if (!fields.Title) {
+            console.log('🔍 Skipping project without title:', project.id);
+            return;
+        }
+        
+        // Only show projects with Display checkbox checked
+        if (!fields.Display) {
+            console.log('🔍 Skipping project without Display checkbox:', fields.Title);
+            return;
+        }
+        
+        // Log if project has no image (but still render it)
+        if (!fields['Main Image']?.[0]) {
+            console.log('🔍 Project has no main image:', fields.Title);
+        }
         
         const projectItem = document.createElement('div');
         projectItem.className = 'project-list-item';
@@ -38,25 +86,51 @@ function renderProjectsList(projects) {
             dateDisplay = fields.Year;
         }
 
-        // Format subheading information
+        // Enhanced subheading information
         const subheadingInfo = [];
+        
+        // Use enhanced fields if available, fallback to legacy fields
+        const medium = fields['Primary Medium'] || fields.Medium || '';
+        const dimensions = fields.Dimensions || fields['Space Requirements'] || '';
+        
         if (dateDisplay) subheadingInfo.push(dateDisplay);
-        if (fields.Medium) subheadingInfo.push(fields.Medium);
-        if (fields.Dimensions) subheadingInfo.push(fields.Dimensions);
+        if (medium) subheadingInfo.push(medium);
+        if (fields.Duration) {
+            const formattedDuration = formatDuration(fields.Duration);
+            subheadingInfo.push(formattedDuration);
+        }
+        if (dimensions) subheadingInfo.push(dimensions);
+        
         const subheadingText = subheadingInfo.join(' | ');
         
-        // Add Project URL if available
+        // Project URL removed from portfolio display
         let projectUrlHtml = '';
-        if (fields['Project URL']) {
-            projectUrlHtml = `<div class="project-link"><a href="${fields['Project URL']}" target="_blank" rel="noopener noreferrer">Link</a></div>`;
-        }
+        
+        // Enhanced description handling
+        const description = fields['Project Statement'] || fields.Description || '';
+        const shortDescription = fields.Description || description;
+        
+        // Duration is now included in subheading, so no separate duration HTML needed
+        let durationHtml = '';
+        
+        // Handle missing images gracefully
+        const imageHtml = fields['Main Image']?.[0] 
+            ? `<img src="${fields['Main Image'][0].url}" alt="${fields.Title}" class="project-list-image">`
+            : `<div class="project-list-image-placeholder">
+                <div class="placeholder-content">
+                    <span class="placeholder-text">${fields.Title}</span>
+                    <small>No image</small>
+                </div>
+               </div>`;
         
         projectItem.innerHTML = `
-            <img src="${fields['Main Image'][0].url}" alt="${fields.Title}" class="project-list-image">
+            ${imageHtml}
             <div class="project-list-info">
                 <h3>${fields.Title || 'Untitled Project'}</h3>
                 ${subheadingText ? `<div class="subheading">${subheadingText}</div>` : ''}
-                <p>${fields.Description || ''}</p>
+                <p>${shortDescription}</p>
+                ${shortDescription ? '<div class="read-more"><em>Read More</em></div>' : ''}
+                ${durationHtml}
                 ${projectUrlHtml}
                 ${tagsHTML ? `<div class="project-list-tags">${tagsHTML}</div>` : ''}
             </div>
@@ -103,11 +177,8 @@ function renderProjectGroupList(projects) {
         if (fields.Dimensions) subheadingInfo.push(fields.Dimensions);
         const subheadingText = subheadingInfo.join(' | ');
         
-        // Add Project URL if available
+        // Project URL removed from portfolio display
         let projectUrlHtml = '';
-        if (fields['Project URL']) {
-            projectUrlHtml = `<div class="project-link"><a href="${fields['Project URL']}" target="_blank" rel="noopener noreferrer">Link</a></div>`;
-        }
         
         projectItem.innerHTML = `
             <img src="${fields['Main Image'][0].url}" alt="${fields.Title}" class="project-list-image">

@@ -1,3 +1,28 @@
+// Format duration from seconds to "X Minutes" format
+function formatDuration(duration) {
+    // Convert string to number if it's a string number
+    let totalSeconds;
+    if (typeof duration === 'string' && /^\d+$/.test(duration)) {
+        totalSeconds = parseInt(duration);
+    } else if (typeof duration === 'number') {
+        totalSeconds = Math.floor(duration);
+    } else if (typeof duration === 'string') {
+        // If it's already formatted, return as is
+        return duration;
+    } else {
+        return duration;
+    }
+    
+    const minutes = Math.floor(totalSeconds / 60);
+    
+    if (minutes >= 1) {
+        return minutes === 1 ? `${minutes} Minute` : `${minutes} Minutes`;
+    } else {
+        // For durations under a minute, show seconds
+        return totalSeconds === 1 ? `${totalSeconds} Second` : `${totalSeconds} Seconds`;
+    }
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
     try {
         // Add a timeout to ensure we show something if Airtable doesn't respond
@@ -8,10 +33,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
             // Race between Airtable request and timeout
             const data = await Promise.race([
-                fetchAirtableData({
-                    table: AIRTABLE_CONFIG.TABLE_NAME,
-                    view: AIRTABLE_CONFIG.VIEW_NAME
-                }),
+                fetchProjects(),
                 timeoutPromise
             ]);
             
@@ -20,6 +42,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             
             // Debug output
             console.log('Projects loaded:', window.projects.length);
+            console.log('🔍 First project fields:', window.projects[0]?.fields);
+            console.log('🔍 Current URL hash:', window.location.hash);
 
             // Check if we actually have data
             if (!window.projects || window.projects.length === 0) {
@@ -59,14 +83,28 @@ document.addEventListener('DOMContentLoaded', async () => {
         const initialFilter = window.location.hash.slice(1) || 'all';
         
         // Apply initial view and filter
+        console.log('🔍 About to apply initial filter:', initialFilter);
         if (typeof applyFilterWithCurrentView === 'function') {
             // View switcher handles this
             applyFilterWithCurrentView(initialFilter);
         } else {
             // Fallback if view-switcher isn't loaded
-            renderProjects(filterProjects(initialFilter));
+            const filteredProjects = filterProjects(initialFilter);
+            console.log('🔍 Filtered projects for display:', filteredProjects?.length || 0);
+            renderProjects(filteredProjects);
             setupNavigation();
         }
+        
+        // Force a render to make sure something shows up
+        console.log('🔍 Forcing render of all projects as backup...');
+        setTimeout(() => {
+            const container = document.getElementById('projectsContainer');
+            if (container && container.innerHTML.includes('Loading projects')) {
+                console.log('🔍 Container still showing loading, forcing render...');
+                container.className = 'projects-grid';
+                renderProjects(window.projects);
+            }
+        }, 1000);
     } catch (error) {
         console.error('Failed to load projects:', error);
         document.getElementById('projectsContainer').innerHTML = 
@@ -75,6 +113,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 function filterProjects(filter) {
+    // Use enhanced filtering if available, fallback to legacy
+    if (typeof enhancedFilterProjects === 'function') {
+        return enhancedFilterProjects(filter);
+    }
+    
+    // Legacy filtering function (keeping for compatibility)
+    return legacyFilterProjects(filter);
+}
+
+function legacyFilterProjects(filter) {
     const today = new Date();
     
     switch(filter) {
@@ -137,11 +185,19 @@ function filterProjects(filter) {
             return window.projects.filter(project => {
                 const tags = project.fields.Tags || [];
                 return tags.includes('Workshops');
+            }).sort((a, b) => {
+                const dateA = new Date(a.fields.Date || a.fields.Year || 0);
+                const dateB = new Date(b.fields.Date || b.fields.Year || 0);
+                return dateB - dateA;
             });
         case 'writing':
             return window.projects.filter(project => {
                 const tags = project.fields.Tags || [];
                 return tags.includes('Writing');
+            }).sort((a, b) => {
+                const dateA = new Date(a.fields.Date || a.fields.Year || 0);
+                const dateB = new Date(b.fields.Date || b.fields.Year || 0);
+                return dateB - dateA;
             });
         case 'upcoming':
             return window.projects.filter(project => {
@@ -153,9 +209,17 @@ function filterProjects(filter) {
                 return dateA - dateB;
             });
         case 'about':
-            return []; // Handle about page separately
+            // Load and render about page content
+            loadAboutContent().then(content => {
+                renderAboutPage(content);
+            });
+            return null; // Return null since we're handling rendering directly
         default:
-            return window.projects;
+            return window.projects.sort((a, b) => {
+                const dateA = new Date(a.fields.Date || a.fields.Year || 0);
+                const dateB = new Date(b.fields.Date || b.fields.Year || 0);
+                return dateB - dateA;
+            });
     }
 }
 
@@ -187,36 +251,78 @@ function renderProjectGroup(projects) {
     
     projects.forEach(project => {
         const fields = project.fields;
-        if (!fields['Main Image']?.[0]) return;
+        
+        // Skip projects without titles, but allow projects without images
+        if (!fields.Title) {
+            console.log('🔍 Skipping project without title:', project.id);
+            return;
+        }
+        
+        // Log if project has no image (but still render it)
+        if (!fields['Main Image']?.[0]) {
+            console.log('🔍 Project has no main image:', fields.Title);
+        }
         
         const projectCard = document.createElement('div');
         projectCard.className = 'project-card';
         projectCard.dataset.projectId = project.id;
         
-        // Safely handle tags whether they exist or not
-        const tagsHTML = fields.Tags && Array.isArray(fields.Tags) 
-            ? fields.Tags.map(tag => `<span class="tag">${tag}</span>`).join('')
+        // Enhanced tag handling - supports both legacy Tags and new media classification
+        let allTags = [];
+        
+        // Legacy tags
+        if (fields.Tags && Array.isArray(fields.Tags)) {
+            allTags = [...fields.Tags];
+        }
+        
+        // Add new classification fields if available
+        if (fields['Primary Medium']) allTags.push(fields['Primary Medium']);
+        if (fields['Secondary Media'] && Array.isArray(fields['Secondary Media'])) {
+            allTags = [...allTags, ...fields['Secondary Media']];
+        }
+        if (fields['Interaction Type']) allTags.push(fields['Interaction Type']);
+        
+        // Remove duplicates and create HTML
+        const uniqueTags = [...new Set(allTags)];
+        const tagsHTML = uniqueTags.length > 0 
+            ? uniqueTags.map(tag => `<span class="tag">${tag}</span>`).join('')
             : '';
 
-        // Format subheading information
+        // Format subheading information - enhanced for new database structure
         const subheadingInfo = [];
-        if (fields.Year) subheadingInfo.push(fields.Year);
-        if (fields.Medium) subheadingInfo.push(fields.Medium);
-        if (fields.Dimensions) subheadingInfo.push(fields.Dimensions);
+        
+        // Use enhanced fields if available, fallback to legacy fields
+        const year = fields.Year || (fields.Date ? new Date(fields.Date).getFullYear() : '');
+        const medium = fields['Primary Medium'] || fields.Medium || '';
+        const dimensions = fields.Dimensions || fields['Space Requirements'] || '';
+        
+        if (year) subheadingInfo.push(year);
+        if (medium) subheadingInfo.push(medium);
+        if (fields.Duration) {
+            const formattedDuration = formatDuration(fields.Duration);
+            subheadingInfo.push(formattedDuration);
+        }
+        if (dimensions) subheadingInfo.push(dimensions);
+        
         const subheadingText = subheadingInfo.join(' | ');
         
-        // Add Project URL if available
+        // Project URL removed from portfolio display
         let projectUrlHtml = '';
-        if (fields['Project URL']) {
-            projectUrlHtml = `<div class="project-link"><a href="${fields['Project URL']}" target="_blank" rel="noopener noreferrer">Link</a></div>`;
-        }
+        
+        // Enhanced description - use Project Statement if available, fallback to Description
+        const description = fields['Project Statement'] || fields.Description || '';
+        const shortDescription = fields.Description || description;
+        
+        // Duration is now included in subheading, so no separate duration HTML needed
+        let durationHtml = '';
         
         projectCard.innerHTML = `
             <img src="${fields['Main Image'][0].url}" alt="${fields.Title}" class="project-image">
             <div class="project-info">
                 <h3>${fields.Title || 'Untitled Project'}</h3>
                 ${subheadingText ? `<div class="subheading">${subheadingText}</div>` : ''}
-                <p>${fields.Description || ''}</p>
+                <p>${shortDescription}</p>
+                ${durationHtml}
                 ${projectUrlHtml}
                 ${tagsHTML ? `<div class="project-tags">${tagsHTML}</div>` : ''}
             </div>
@@ -229,30 +335,78 @@ function renderProjectGroup(projects) {
 }
 
 function renderProjects(projects) {
+    console.log('🔍 renderProjects called with:', projects?.length || 0, 'projects');
     const container = document.getElementById('projectsContainer');
     
+    if (!container) {
+        console.error('🔍 Container not found!');
+        return;
+    }
+    
     if (projects === null) {
+        console.log('🔍 Projects is null, skipping render');
         return; // Skip rendering if it's already handled (like in new-media case)
     }
     
     container.innerHTML = ''; // Clear existing content
+    console.log('🔍 Container cleared, about to render', projects.length, 'projects');
     
     if (projects.length === 0) {
         container.innerHTML = '<p>No projects found in this category.</p>';
+        console.log('🔍 No projects to display');
         return;
     }
     
-    projects.forEach(project => {
+    // Sort projects in reverse chronological order (newest first)
+    const sortedProjects = [...projects].sort((a, b) => {
+        const dateA = new Date(a.fields.Date || a.fields.Year || 0);
+        const dateB = new Date(b.fields.Date || b.fields.Year || 0);
+        return dateB - dateA;
+    });
+    
+    sortedProjects.forEach(project => {
         const fields = project.fields;
-        if (!fields['Main Image']?.[0]) return;
+        
+        // Skip projects without titles, but allow projects without images
+        if (!fields.Title) {
+            console.log('🔍 Skipping project without title:', project.id);
+            return;
+        }
+        
+        // Only show projects with Display checkbox checked
+        if (!fields.Display) {
+            console.log('🔍 Skipping project without Display checkbox:', fields.Title);
+            return;
+        }
+        
+        // Log if project has no image (but still render it)
+        if (!fields['Main Image']?.[0]) {
+            console.log('🔍 Project has no main image:', fields.Title);
+        }
         
         const projectCard = document.createElement('div');
         projectCard.className = 'project-card';
         projectCard.dataset.projectId = project.id;
         
-        // Safely handle tags whether they exist or not
-        const tagsHTML = fields.Tags && Array.isArray(fields.Tags) 
-            ? fields.Tags.map(tag => `<span class="tag">${tag}</span>`).join('')
+        // Enhanced tag handling - supports both legacy Tags and new media classification
+        let allTags = [];
+        
+        // Legacy tags
+        if (fields.Tags && Array.isArray(fields.Tags)) {
+            allTags = [...fields.Tags];
+        }
+        
+        // Add new classification fields if available
+        if (fields['Primary Medium']) allTags.push(fields['Primary Medium']);
+        if (fields['Secondary Media'] && Array.isArray(fields['Secondary Media'])) {
+            allTags = [...allTags, ...fields['Secondary Media']];
+        }
+        if (fields['Interaction Type']) allTags.push(fields['Interaction Type']);
+        
+        // Remove duplicates and create HTML
+        const uniqueTags = [...new Set(allTags)];
+        const tagsHTML = uniqueTags.length > 0 
+            ? uniqueTags.map(tag => `<span class="tag">${tag}</span>`).join('')
             : '';
 
         // Format date information - show only year
@@ -266,25 +420,47 @@ function renderProjects(projects) {
             dateDisplay = fields.Year;
         }
 
-        // Format subheading information
+        // Enhanced subheading information
         const subheadingInfo = [];
+        
+        // Use enhanced fields if available, fallback to legacy fields
+        const medium = fields['Primary Medium'] || fields.Medium || '';
+        const dimensions = fields.Dimensions || fields['Space Requirements'] || '';
+        
         if (dateDisplay) subheadingInfo.push(dateDisplay);
-        if (fields.Medium) subheadingInfo.push(fields.Medium);
-        if (fields.Dimensions) subheadingInfo.push(fields.Dimensions);
+        if (medium) subheadingInfo.push(medium);
+        if (dimensions) subheadingInfo.push(dimensions);
+        
         const subheadingText = subheadingInfo.join(' | ');
         
-        // Add Project URL if available
+        // Project URL removed from portfolio display
         let projectUrlHtml = '';
-        if (fields['Project URL']) {
-            projectUrlHtml = `<div class="project-link"><a href="${fields['Project URL']}" target="_blank" rel="noopener noreferrer">Link</a></div>`;
-        }
+        
+        // Enhanced description handling
+        const description = fields['Project Statement'] || fields.Description || '';
+        const shortDescription = fields.Description || description;
+        
+        // Duration is now included in subheading, so no separate duration HTML needed
+        let durationHtml = '';
+        
+        // Handle missing images gracefully
+        const imageHtml = fields['Main Image']?.[0] 
+            ? `<img src="${fields['Main Image'][0].url}" alt="${fields.Title}" class="project-image">`
+            : `<div class="project-image-placeholder">
+                <div class="placeholder-content">
+                    <span class="placeholder-text">${fields.Title}</span>
+                    <small>No image</small>
+                </div>
+               </div>`;
         
         projectCard.innerHTML = `
-            <img src="${fields['Main Image'][0].url}" alt="${fields.Title}" class="project-image">
+            ${imageHtml}
             <div class="project-info">
                 <h3>${fields.Title || 'Untitled Project'}</h3>
                 ${subheadingText ? `<div class="subheading">${subheadingText}</div>` : ''}
-                <p>${fields.Description || ''}</p>
+                <p>${shortDescription}</p>
+                ${shortDescription ? '<div class="read-more"><em>Read More</em></div>' : ''}
+                ${durationHtml}
                 ${projectUrlHtml}
                 ${tagsHTML ? `<div class="project-tags">${tagsHTML}</div>` : ''}
             </div>
@@ -292,6 +468,8 @@ function renderProjects(projects) {
         
         container.appendChild(projectCard);
     });
+    
+    console.log('🔍 Finished rendering', sortedProjects.length, 'projects to container');
 }
 
 function setupModal() {
@@ -318,7 +496,13 @@ function setupModal() {
         if (projectElement) {
             const projectId = projectElement.dataset.projectId;
             
-            // Find the matching project data
+            // Try enhanced modal first, fallback to basic if needed
+            if (typeof showEnhancedProjectModal === 'function') {
+                showEnhancedProjectModal(projectId);
+                return;
+            }
+            
+            // Fallback to basic modal functionality
             const projectData = window.projects.find(p => p.id === projectId);
             
             if (projectData) {

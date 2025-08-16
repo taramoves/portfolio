@@ -1,0 +1,116 @@
+/* Homepage/Landing Page Styles */
+
+.homepage {
+    background: url('../assets/homepage/background.png') no-repeat center center fixed;
+    background-size: cover;
+    min-height: 100vh;
+    width: 100vw;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+/* Hero Section */
+.hero-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 0;
+    margin: 0;
+    background: transparent;
+}
+
+.hero-content {
+    max-width: 600px;
+    background: transparent;
+}
+
+.hero-title {
+    display: none;
+}
+
+.hero-image {
+    display: none;
+}
+
+.hero-portrait {
+    display: none;
+}
+
+.hero-actions {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.cta-button {
+    padding: 15px 40px;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: inline-block;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 1rem;
+    margin: 0 10px;
+}
+
+.cta-button.primary {
+    background: #000;
+    color: #fff;
+    border: 2px solid #000;
+}
+
+.cta-button.primary:hover {
+    background: #333;
+    border-color: #333;
+    transform: translateY(-2px);
+}
+
+.cta-button.secondary {
+    background: #000;
+    color: #fff;
+    border: 2px solid #000;
+}
+
+.cta-button.secondary:hover {
+    background: #333;
+    border-color: #333;
+    transform: translateY(-2px);
+}
+
+
+
+/* Navigation Updates */
+.nav-home.active {
+    border-bottom-color: #000;
+}
+
+/* Mobile Responsive */
+@media screen and (max-width: 768px) {
+    .hero-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .cta-button {
+        width: 200px;
+        text-align: center;
+        margin: 5px 0;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .cta-button {
+        padding: 12px 30px;
+        font-size: 0.9rem;
+    }
+} 
