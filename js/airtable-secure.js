@@ -35,9 +35,11 @@ async function fetchAirtableDataSecure({ table, view, filterByFormula = '' }) {
 // Enhanced fetch functions for new tables
 async function fetchProjects(view = null) {
     await initAirtableConfig();
+    const viewToUse = view || AIRTABLE_CONFIG.PROJECTS_VIEW;
+    console.log('🔍 Fetching from Airtable view:', viewToUse);
     return fetchAirtableDataSecure({
         table: AIRTABLE_CONFIG.PROJECTS_TABLE,
-        view: view || AIRTABLE_CONFIG.PROJECTS_VIEW
+        view: viewToUse
     });
 }
 

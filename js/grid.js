@@ -43,6 +43,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             // Debug output
             console.log('Projects loaded:', window.projects.length);
             console.log('🔍 First project fields:', window.projects[0]?.fields);
+            console.log('🔍 All field names:', Object.keys(window.projects[0]?.fields || {}));
             console.log('🔍 First project Display field:', window.projects[0]?.fields?.Display);
             console.log('🔍 Display field type:', typeof window.projects[0]?.fields?.Display);
             
