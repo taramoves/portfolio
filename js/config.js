@@ -39,6 +39,32 @@ async function loadFromLocalConfig() {
             const host = window.location.hostname;
             const isLocalhost = host === 'localhost' || host === '127.0.0.1' || host.endsWith('.local');
             if (!isLocalhost) {
+                // Try optional production config file if provided by hosting
+                try {
+                    const prodResponse = await fetch('config/env.production');
+                    if (prodResponse.ok) {
+                        const text = await prodResponse.text();
+                        const parsed = {};
+                        text.split('\n').forEach(line => {
+                            line = line.trim();
+                            if (line && !line.startsWith('#')) {
+                                const [key, ...valueParts] = line.split('=');
+                                const value = valueParts.join('=');
+                                switch(key) {
+                                    case 'AIRTABLE_API_TOKEN': parsed.ACCESS_TOKEN = value; break;
+                                    case 'AIRTABLE_BASE_ID': parsed.BASE_ID = value; break;
+                                    case 'AIRTABLE_PROJECTS_TABLE': parsed.PROJECTS_TABLE = value; break;
+                                    case 'AIRTABLE_PROJECTS_VIEW': parsed.PROJECTS_VIEW = value; break;
+                                    case 'AIRTABLE_MEDIA_TABLE': parsed.MEDIA_TABLE = value; break;
+                                    case 'AIRTABLE_EXHIBITIONS_TABLE': parsed.EXHIBITIONS_TABLE = value; break;
+                                    case 'AIRTABLE_COLLABORATORS_TABLE': parsed.COLLABORATORS_TABLE = value; break;
+                                    case 'AIRTABLE_WORKSHOPS_TABLE': parsed.WORKSHOPS_TABLE = value; break;
+                                }
+                            }
+                        });
+                        return parsed;
+                    }
+                } catch (_) { /* ignore */ }
                 return null;
             }
         }

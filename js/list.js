@@ -61,18 +61,22 @@ function renderProjectsList(projects) {
             return;
         }
         
-        // Only show projects explicitly marked for display OR tagged as Portfolio
-        const hasDisplayField = Object.prototype.hasOwnProperty.call(fields, 'Display');
-        const isMarkedForDisplay = fields.Display === true || fields.Display === 'true' || fields.Display === 1;
-        const isPortfolioTagged = Array.isArray(fields.Tags) && fields.Tags.includes('Portfolio');
-        if (hasDisplayField) {
-            if (!isMarkedForDisplay && !isPortfolioTagged) {
-                console.log('🔍 Skipping project (Display not checked and not Portfolio tag):', fields.Title);
+        // For real data, only show projects marked Display or Portfolio-tagged
+        // Always show sample fallback data (no Display field)
+        const isSample = project.id && project.id.startsWith('sample');
+        if (!isSample) {
+            const hasDisplayField = Object.prototype.hasOwnProperty.call(fields, 'Display');
+            const isMarkedForDisplay = fields.Display === true || fields.Display === 'true' || fields.Display === 1;
+            const isPortfolioTagged = Array.isArray(fields.Tags) && fields.Tags.includes('Portfolio');
+            if (hasDisplayField) {
+                if (!isMarkedForDisplay && !isPortfolioTagged) {
+                    console.log('🔍 Skipping project (Display not checked and not Portfolio tag):', fields.Title);
+                    return;
+                }
+            } else if (!isPortfolioTagged) {
+                console.log('🔍 Skipping project (no Display field and not Portfolio tag):', fields.Title);
                 return;
             }
-        } else if (!isPortfolioTagged) {
-            console.log('🔍 Skipping project (no Display field and not Portfolio tag):', fields.Title);
-            return;
         }
         
         // Log if project has no image (but still render it)
