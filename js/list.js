@@ -40,6 +40,12 @@ function renderProjectsList(projects) {
     container.innerHTML = ''; // Clear existing content
     container.className = 'projects-list'; // Change to list layout
     
+    // Debug: Count projects with Display field
+    const projectsWithDisplay = projects.filter(p => p.fields.Display);
+    console.log('🔍 DEBUG: Total projects:', projects.length);
+    console.log('🔍 DEBUG: Projects with Display=true:', projectsWithDisplay.length);
+    console.log('🔍 DEBUG: Sample Display values:', projects.slice(0, 3).map(p => ({ title: p.fields.Title, display: p.fields.Display })));
+    
     if (projects.length === 0) {
         container.innerHTML = '<p>No projects found in this category.</p>';
         return;
@@ -61,11 +67,17 @@ function renderProjectsList(projects) {
             return;
         }
         
-        // Only show projects with Display checkbox checked
+        // TEMPORARILY DISABLED: Only show projects with Display checkbox checked
+        // TODO: Re-enable after debugging Display field issue
+        /*
         if (!fields.Display) {
-            console.log('🔍 Skipping project without Display checkbox:', fields.Title);
+            console.log('🔍 Skipping project without Display checkbox:', fields.Title, 'Display value:', fields.Display, 'Type:', typeof fields.Display);
             return;
         }
+        */
+        
+        // Debug: Show what Display field contains
+        console.log('🔍 Project Display field:', fields.Title, '- Display:', fields.Display, 'Type:', typeof fields.Display);
         
         // Log if project has no image (but still render it)
         if (!fields['Main Image']?.[0]) {
