@@ -30,21 +30,8 @@ function renderProjectsList(projects) {
         return; // Skip rendering if it's already handled (like in new-media case with custom handling)
     }
     
-    // Check if projects is defined and is an array
-    if (!projects || !Array.isArray(projects)) {
-        console.warn('⚠️ renderProjectsList called with invalid projects data:', projects);
-        container.innerHTML = '<p>Loading projects...</p>';
-        return;
-    }
-    
     container.innerHTML = ''; // Clear existing content
     container.className = 'projects-list'; // Change to list layout
-    
-    // Debug: Count projects with Display field
-    const projectsWithDisplay = projects.filter(p => p.fields.Display);
-    console.log('🔍 DEBUG: Total projects:', projects.length);
-    console.log('🔍 DEBUG: Projects with Display=true:', projectsWithDisplay.length);
-    console.log('🔍 DEBUG: Sample Display values:', projects.slice(0, 3).map(p => ({ title: p.fields.Title, display: p.fields.Display })));
     
     if (projects.length === 0) {
         container.innerHTML = '<p>No projects found in this category.</p>';
@@ -67,17 +54,11 @@ function renderProjectsList(projects) {
             return;
         }
         
-        // TEMPORARILY DISABLED: Only show projects with Display checkbox checked
-        // TODO: Re-enable after debugging Display field issue
-        /*
+        // Only show projects with Display checkbox checked
         if (!fields.Display) {
-            console.log('🔍 Skipping project without Display checkbox:', fields.Title, 'Display value:', fields.Display, 'Type:', typeof fields.Display);
+            console.log('🔍 Skipping project without Display checkbox:', fields.Title);
             return;
         }
-        */
-        
-        // Debug: Show what Display field contains
-        console.log('🔍 Project Display field:', fields.Title, '- Display:', fields.Display, 'Type:', typeof fields.Display);
         
         // Log if project has no image (but still render it)
         if (!fields['Main Image']?.[0]) {

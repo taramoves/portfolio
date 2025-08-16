@@ -6,7 +6,7 @@ const DEFAULT_CONFIG = {
     ACCESS_TOKEN: '',
     BASE_ID: '',
     PROJECTS_TABLE: 'Projects',
-    PROJECTS_VIEW: null,
+    PROJECTS_VIEW: 'Grid view',
     MEDIA_TABLE: 'Media Assets',
     EXHIBITIONS_TABLE: 'Exhibitions',
     COLLABORATORS_TABLE: 'Collaborators',
@@ -21,7 +21,7 @@ function loadFromEnv() {
             ACCESS_TOKEN: process.env.AIRTABLE_API_TOKEN,
             BASE_ID: process.env.AIRTABLE_BASE_ID,
             PROJECTS_TABLE: process.env.AIRTABLE_PROJECTS_TABLE || 'Projects',
-            PROJECTS_VIEW: process.env.AIRTABLE_PROJECTS_VIEW || null,
+            PROJECTS_VIEW: process.env.AIRTABLE_PROJECTS_VIEW || 'Grid view',
             MEDIA_TABLE: process.env.AIRTABLE_MEDIA_TABLE || 'Media Assets',
             EXHIBITIONS_TABLE: process.env.AIRTABLE_EXHIBITIONS_TABLE || 'Exhibitions',
             COLLABORATORS_TABLE: process.env.AIRTABLE_COLLABORATORS_TABLE || 'Collaborators',
@@ -34,59 +34,49 @@ function loadFromEnv() {
 // Load from local config file (for client-side development)
 async function loadFromLocalConfig() {
     try {
-        // Check if we're in a development environment first
-        if (window.location.protocol === 'file:' || 
-            window.location.hostname === 'localhost' || 
-            window.location.hostname === '127.0.0.1') {
-            
-            const response = await fetch('config/env.local');
-            if (!response.ok) throw new Error('Config file not found');
-            
-            const text = await response.text();
-            const config = {};
-            
-            // Parse simple key=value format
-            text.split('\n').forEach(line => {
-                line = line.trim();
-                if (line && !line.startsWith('#')) {
-                    const [key, ...valueParts] = line.split('=');
-                    const value = valueParts.join('=');
-                    
-                    switch(key) {
-                        case 'AIRTABLE_API_TOKEN':
-                            config.ACCESS_TOKEN = value;
-                            break;
-                        case 'AIRTABLE_BASE_ID':
-                            config.BASE_ID = value;
-                            break;
-                        case 'AIRTABLE_PROJECTS_TABLE':
-                            config.PROJECTS_TABLE = value;
-                            break;
-                        case 'AIRTABLE_PROJECTS_VIEW':
-                            config.PROJECTS_VIEW = value;
-                            break;
-                        case 'AIRTABLE_MEDIA_TABLE':
-                            config.MEDIA_TABLE = value;
-                            break;
-                        case 'AIRTABLE_EXHIBITIONS_TABLE':
-                            config.EXHIBITIONS_TABLE = value;
-                            break;
-                        case 'AIRTABLE_COLLABORATORS_TABLE':
-                            config.COLLABORATORS_TABLE = value;
-                            break;
-                        case 'AIRTABLE_WORKSHOPS_TABLE':
-                            config.WORKSHOPS_TABLE = value;
-                            break;
-                    }
+        const response = await fetch('config/env.local');
+        if (!response.ok) throw new Error('Config file not found');
+        
+        const text = await response.text();
+        const config = {};
+        
+        // Parse simple key=value format
+        text.split('\n').forEach(line => {
+            line = line.trim();
+            if (line && !line.startsWith('#')) {
+                const [key, ...valueParts] = line.split('=');
+                const value = valueParts.join('=');
+                
+                switch(key) {
+                    case 'AIRTABLE_API_TOKEN':
+                        config.ACCESS_TOKEN = value;
+                        break;
+                    case 'AIRTABLE_BASE_ID':
+                        config.BASE_ID = value;
+                        break;
+                    case 'AIRTABLE_PROJECTS_TABLE':
+                        config.PROJECTS_TABLE = value;
+                        break;
+                    case 'AIRTABLE_PROJECTS_VIEW':
+                        config.PROJECTS_VIEW = value;
+                        break;
+                    case 'AIRTABLE_MEDIA_TABLE':
+                        config.MEDIA_TABLE = value;
+                        break;
+                    case 'AIRTABLE_EXHIBITIONS_TABLE':
+                        config.EXHIBITIONS_TABLE = value;
+                        break;
+                    case 'AIRTABLE_COLLABORATORS_TABLE':
+                        config.COLLABORATORS_TABLE = value;
+                        break;
+                    case 'AIRTABLE_WORKSHOPS_TABLE':
+                        config.WORKSHOPS_TABLE = value;
+                        break;
                 }
-            });
-            
-            return config;
-        } else {
-            // In production, skip trying to load local config
-            console.log('🚀 Production environment detected, skipping local config');
-            return null;
-        }
+            }
+        });
+        
+        return config;
     } catch (error) {
         console.warn('Could not load local config file:', error.message);
         return null;
@@ -109,13 +99,13 @@ async function loadConfig() {
         return { ...DEFAULT_CONFIG, ...localConfig };
     }
     
-    // Fallback to hardcoded (for production deployment)
-    console.log('✅ Using production configuration');
+    // Fallback to hardcoded (for backward compatibility)
+    console.warn('⚠️ Using fallback configuration - update your config files!');
     return {
         ACCESS_TOKEN: 'patuh3Jlg71SRPHIb.679b821c7528d252101cdc7f40cc8ed0e44c7e3d9443c2505213f89501a7ad2c',
         BASE_ID: 'appy5PeLmP9YHhroy',
         PROJECTS_TABLE: 'Projects',
-        PROJECTS_VIEW: null,
+        PROJECTS_VIEW: 'Grid view',
         MEDIA_TABLE: 'Media Assets',
         EXHIBITIONS_TABLE: 'Exhibitions',
         COLLABORATORS_TABLE: 'Collaborators',

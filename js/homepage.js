@@ -105,25 +105,7 @@ function showPortfolio() {
     // Show all projects in list view only
     const container = document.getElementById('projectsContainer');
     container.className = 'projects-list';
-    
-    // Check if projects are loaded
-    if (!window.projects || !Array.isArray(window.projects)) {
-        console.log('🔍 Projects not loaded yet, waiting...');
-        container.innerHTML = '<p>Loading projects...</p>';
-        
-        // Wait for projects to be loaded
-        const waitForProjects = () => {
-            if (window.projects && Array.isArray(window.projects) && window.projects.length > 0) {
-                console.log('🔍 Projects now available, rendering portfolio...');
-                renderProjectsList(window.projects);
-            } else {
-                setTimeout(waitForProjects, 200);
-            }
-        };
-        setTimeout(waitForProjects, 100);
-    } else {
-        renderProjectsList(window.projects);
-    }
+    renderProjectsList(window.projects);
 }
 
 function updateActiveNavigation(activeFilter) {

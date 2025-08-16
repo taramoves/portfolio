@@ -43,16 +43,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             // Debug output
             console.log('Projects loaded:', window.projects.length);
             console.log('🔍 First project fields:', window.projects[0]?.fields);
-            console.log('🔍 All field names:', Object.keys(window.projects[0]?.fields || {}));
-            console.log('🔍 First project Display field:', window.projects[0]?.fields?.Display);
-            console.log('🔍 Display field type:', typeof window.projects[0]?.fields?.Display);
-            
-            // Count how many projects have Display = true
-            const displayedProjects = window.projects.filter(p => p.fields.Display === true);
-            const displayedProjectsLoose = window.projects.filter(p => !!p.fields.Display);
-            console.log('🔍 Projects with Display === true:', displayedProjects.length);
-            console.log('🔍 Projects with truthy Display:', displayedProjectsLoose.length);
-            console.log('🔍 Environment:', window.location.hostname);
             console.log('🔍 Current URL hash:', window.location.hash);
 
             // Check if we actually have data
