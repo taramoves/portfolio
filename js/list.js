@@ -30,6 +30,13 @@ function renderProjectsList(projects) {
         return; // Skip rendering if it's already handled (like in new-media case with custom handling)
     }
     
+    // Check if projects is defined and is an array
+    if (!projects || !Array.isArray(projects)) {
+        console.warn('⚠️ renderProjectsList called with invalid projects data:', projects);
+        container.innerHTML = '<p>Loading projects...</p>';
+        return;
+    }
+    
     container.innerHTML = ''; // Clear existing content
     container.className = 'projects-list'; // Change to list layout
     
