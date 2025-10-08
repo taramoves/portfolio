@@ -80,7 +80,7 @@ function createFeaturedProjectCard(project) {
 function setupHomepageNavigation() {
     // Handle homepage navigation clicks
     document.addEventListener('click', (event) => {
-        const link = event.target.closest('a[href="#portfolio"], a[href="#about"], a[href="#home"]');
+        const link = event.target.closest('a[href="#portfolio"], a[href="#about"], a[href="#home"], a[href="#work"]');
         if (link) {
             event.preventDefault();
             const filter = link.getAttribute('href').slice(1);
@@ -90,6 +90,11 @@ function setupHomepageNavigation() {
                 renderHomepage();
             } else if (filter === 'portfolio') {
                 showPortfolio();
+            } else if (filter === 'work') {
+                const filtered = (window.projects || []).filter(p => Array.isArray(p.fields?.Tags) && p.fields.Tags.includes('Work'));
+                const container = document.getElementById('projectsContainer');
+                container.className = 'projects-list';
+                renderProjectsList(filtered);
             } else if (filter === 'about') {
                 loadAboutContent().then(content => {
                     renderAboutPage(content);

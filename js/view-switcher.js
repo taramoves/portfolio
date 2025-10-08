@@ -69,6 +69,11 @@ function applyFilterWithCurrentView(filter) {
         // Show all projects in portfolio
         showPortfolio();
         updateActiveNavigation('portfolio');
+    } else if (filter === 'work') {
+        // Show only projects tagged with "Work" in list view
+        const filtered = (window.projects || []).filter(p => Array.isArray(p.fields?.Tags) && p.fields.Tags.includes('Work'));
+        renderProjectsList(filtered);
+        updateActiveNavigation('work');
     } else if (filter === 'about') {
         // About page works the same in both views
         loadAboutContent().then(content => {
@@ -114,13 +119,21 @@ function setupNavigationWithViewSwitcher() {
     
     navLinks.forEach(link => {
         link.addEventListener('click', (e) => {
-            e.preventDefault();
+            const href = link.getAttribute('href') || '';
             const filter = link.getAttribute('data-filter');
-            window.location.hash = filter;
+            
+            // Allow normal navigation for non-hash links or explicit bypass
+            if (!href.startsWith('#') || link.hasAttribute('data-bypass')) {
+                return;
+            }
+
+            e.preventDefault();
+            const desiredFilter = filter || href.slice(1) || 'home';
+            window.location.hash = desiredFilter;
             
             // Use the view switcher to apply the filter with current view
-            applyFilterWithCurrentView(filter);
-            updateActiveNavigation(filter);
+            applyFilterWithCurrentView(desiredFilter);
+            updateActiveNavigation(desiredFilter);
         });
     });
     

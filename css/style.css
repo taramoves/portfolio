@@ -73,6 +73,57 @@ main {
     padding: 20px;
 }
 
+.site-footer {
+    padding: 30px 20px 60px;
+    border-top: 1px solid #000;
+}
+
+.subscribe-form {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.subscribe-form label {
+    display: block;
+    margin-bottom: 8px;
+}
+
+.subscribe-row {
+    display: flex;
+    gap: 10px;
+}
+
+.subscribe-row input[type="email"] {
+    flex: 1;
+    padding: 10px 12px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    font-size: 1rem;
+}
+
+.subscribe-row button {
+    padding: 10px 16px;
+    border: 1px solid #000;
+    background: #000;
+    color: #fff;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.subscribe-row button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.subscribe-message {
+    margin-top: 8px;
+    min-height: 1.2em;
+    color: #333;
+}
+
+.subscribe-message.error { color: #b00020; }
+.subscribe-message.success { color: #0a7a0a; }
+
 .modal {
     display: none;
     position: fixed;
