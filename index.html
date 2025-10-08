@@ -20,8 +20,10 @@
         <nav class="main-nav">
             <ul>
                 <li><a href="#home" data-filter="home" class="nav-home">home</a></li>
-                <li><a href="#portfolio" data-filter="portfolio">portfolio</a></li>
+                <li><a href="#portfolio" data-filter="portfolio">art</a></li>
+                <li><a href="#work" data-filter="work">work</a></li>
                 <li><a href="#about" data-filter="about">about</a></li>
+                <li><a href="./everythingunderthedome/" data-bypass>blog</a></li>
             </ul>
         </nav>
 
@@ -38,6 +40,16 @@
             </div>
         </div>
     </main>
+    <footer class="site-footer">
+        <form id="subscribe-form" class="subscribe-form" novalidate>
+            <label for="subscribe-email">Join the email list</label>
+            <div class="subscribe-row">
+                <input type="email" id="subscribe-email" name="email" placeholder="you@example.com" required>
+                <button type="submit">Subscribe</button>
+            </div>
+            <p class="subscribe-message" id="subscribe-message" aria-live="polite"></p>
+        </form>
+    </footer>
 
     <div id="projectModal" class="modal">
         <div class="modal-content">
@@ -70,5 +82,6 @@
     <script src="js/grid.js"></script>
     <script src="js/list.js"></script>
     <script src="js/view-switcher.js"></script>
+    <script src="js/subscribe.js"></script>
 </body>
 </html>
