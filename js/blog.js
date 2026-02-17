@@ -39,7 +39,7 @@ async function renderBlogList() {
                     ${post.date ? `<time>${formatDate(post.date)}</time>` : ''}
                     ${post.tags && post.tags.length ? `<span class="tags">${post.tags.map(t => `#${t}`).join(' ')}</span>` : ''}
                 </div>
-                ${post.excerpt ? `<p class="excerpt">${post.excerpt}</p>` : ''}
+                ${post.excerpt ? `<p class="blog-excerpt">${post.excerpt}</p>` : ''}
             `;
             frag.appendChild(item);
         });
