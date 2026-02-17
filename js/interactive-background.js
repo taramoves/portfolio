@@ -8,6 +8,7 @@ class InteractiveBackground {
         this.renderer = null;
         this.pointsMesh = null;
         this.canvas = null;
+        this.animationId = null;
         this.buttonDistortions = [
             { active: false, x: 0, y: 0, targetStrength: 0, currentStrength: 0 },
             { active: false, x: 0, y: 0, targetStrength: 0, currentStrength: 0 },
@@ -35,10 +36,11 @@ class InteractiveBackground {
         this.renderer = new THREE.WebGLRenderer({
             canvas: this.canvas,
             alpha: false,
-            antialias: true
+            antialias: false,  // Disable antialiasing for better performance
+            powerPreference: "high-performance"
         });
         this.renderer.setSize(window.innerWidth, window.innerHeight);
-        this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5)); // Limit pixel ratio
 
         // Load texture
         const textureLoader = new THREE.TextureLoader();
@@ -53,8 +55,9 @@ class InteractiveBackground {
 
     createPointCloud(texture) {
         // Create a grid of points - landscape orientation (wider than tall)
-        const width = 300;  // Number of points horizontally (wider)
-        const height = 120; // Number of points vertically (shorter for landscape)
+        // Reduced for better performance and memory usage
+        const width = 150;  // Number of points horizontally (wider)
+        const height = 60;  // Number of points vertically (shorter for landscape)
         const pointCount = width * height;
 
         // Create geometry
@@ -181,7 +184,7 @@ class InteractiveBackground {
     }
 
     animate() {
-        requestAnimationFrame(() => this.animate());
+        this.animationId = requestAnimationFrame(() => this.animate());
 
         if (this.pointsMesh) {
             // Update time for animation
@@ -200,20 +203,43 @@ class InteractiveBackground {
     }
 
     destroy() {
+        // Cancel animation frame to stop rendering
+        if (this.animationId) {
+            cancelAnimationFrame(this.animationId);
+            this.animationId = null;
+        }
+        
+        // Clean up Three.js resources
+        if (this.pointsMesh) {
+            if (this.pointsMesh.geometry) {
+                this.pointsMesh.geometry.dispose();
+            }
+            if (this.pointsMesh.material) {
+                // Dispose texture if it exists
+                if (this.pointsMesh.material.uniforms?.uTexture?.value) {
+                    this.pointsMesh.material.uniforms.uTexture.value.dispose();
+                }
+                this.pointsMesh.material.dispose();
+            }
+            this.scene.remove(this.pointsMesh);
+        }
+        
+        if (this.renderer) {
+            this.renderer.dispose();
+            this.renderer.forceContextLoss();
+        }
+        
+        // Remove canvas from DOM
         if (this.canvas && this.canvas.parentNode) {
             this.canvas.parentNode.removeChild(this.canvas);
         }
-        if (this.renderer) {
-            this.renderer.dispose();
-        }
-        if (this.pointsMesh) {
-            this.pointsMesh.geometry.dispose();
-            this.pointsMesh.material.dispose();
-        }
+        
+        // Clear all references
         this.scene = null;
         this.camera = null;
         this.renderer = null;
         this.pointsMesh = null;
+        this.canvas = null;
     }
 }
 

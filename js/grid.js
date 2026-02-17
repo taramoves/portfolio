@@ -79,32 +79,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Initialize modal
         setupModal();
         
-        // Get initial filter from URL hash
-        const initialFilter = window.location.hash.slice(1) || 'all';
-        
-        // Apply initial view and filter
-        console.log('🔍 About to apply initial filter:', initialFilter);
-        if (typeof applyFilterWithCurrentView === 'function') {
-            // View switcher handles this
-            applyFilterWithCurrentView(initialFilter);
-        } else {
-            // Fallback if view-switcher isn't loaded
-            const filteredProjects = filterProjects(initialFilter);
-            console.log('🔍 Filtered projects for display:', filteredProjects?.length || 0);
-            renderProjects(filteredProjects);
-            setupNavigation();
-        }
-        
-        // Force a render to make sure something shows up
-        console.log('🔍 Forcing render of all projects as backup...');
-        setTimeout(() => {
-            const container = document.getElementById('projectsContainer');
-            if (container && container.innerHTML.includes('Loading projects')) {
-                console.log('🔍 Container still showing loading, forcing render...');
-                container.className = 'projects-grid';
-                renderProjects(window.projects);
-            }
-        }, 1000);
+        // Note: view-switcher.js handles initial page rendering
+        // We just store projects here and let view-switcher determine what to show
+        console.log('✅ Projects loaded and ready for view-switcher.js');
     } catch (error) {
         console.error('Failed to load projects:', error);
         document.getElementById('projectsContainer').innerHTML = 

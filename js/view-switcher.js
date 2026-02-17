@@ -11,21 +11,36 @@ document.addEventListener('DOMContentLoaded', () => {
         // Set up initial navigation with the current view
         setupNavigationWithViewSwitcher();
         
-        // Wait for projects to be loaded, then apply initial filter
-        const waitForProjects = () => {
-            if (window.projects && window.projects.length > 0) {
-                // Handle initial page load based on hash
-                const initialFilter = window.location.hash.slice(1) || 'home';
-                console.log('Applying initial filter:', initialFilter);
-                console.log('🔍 Available projects for filtering:', window.projects.length);
-                applyFilterWithCurrentView(initialFilter);
-            } else {
-                console.log('🔍 Waiting for projects to load...');
-                setTimeout(waitForProjects, 200);
-            }
-        };
+        // Handle browser back/forward and URL changes
+        window.addEventListener('popstate', () => {
+            const filter = window.location.hash.slice(1) || 'home';
+            applyFilterWithCurrentView(filter);
+        });
         
-        setTimeout(waitForProjects, 100);
+        // Handle initial page load based on hash
+        // Empty string, no hash, or explicit 'home' should all show homepage
+        const hash = window.location.hash.slice(1);
+        const initialFilter = (hash === '' || hash === 'all') ? 'home' : hash;
+        
+        // If showing homepage, render immediately without waiting for projects
+        if (initialFilter === 'home' || initialFilter === '') {
+            console.log('Rendering homepage immediately');
+            applyFilterWithCurrentView('home');
+        } else {
+            // For other pages, wait for projects to load
+            const waitForProjects = () => {
+                if (window.projects && window.projects.length > 0) {
+                    console.log('Applying initial filter:', initialFilter);
+                    console.log('🔍 Available projects for filtering:', window.projects.length);
+                    applyFilterWithCurrentView(initialFilter);
+                } else {
+                    console.log('🔍 Waiting for projects to load...');
+                    setTimeout(waitForProjects, 200);
+                }
+            };
+            
+            setTimeout(waitForProjects, 100);
+        }
     } catch (error) {
         console.error('Error in view-switcher initialization:', error);
     }
@@ -134,7 +149,13 @@ function setupNavigationWithViewSwitcher() {
 
             e.preventDefault();
             const desiredFilter = filter || href.slice(1) || 'home';
-            window.location.hash = desiredFilter;
+            
+            // Clear hash for home page
+            if (desiredFilter === 'home') {
+                history.pushState(null, null, window.location.pathname);
+            } else {
+                window.location.hash = desiredFilter;
+            }
             
             // Use the view switcher to apply the filter with current view
             applyFilterWithCurrentView(desiredFilter);
@@ -148,7 +169,8 @@ function setupNavigationWithViewSwitcher() {
 function updateActiveNavigation(filter) {
     document.querySelectorAll('.main-nav a').forEach(link => {
         link.classList.remove('active');
-        if (link.getAttribute('data-filter') === filter) {
+        const linkFilter = link.getAttribute('data-filter');
+        if (linkFilter === filter || (filter === 'home' && link.classList.contains('nav-home'))) {
             link.classList.add('active');
         }
     });
