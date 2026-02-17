@@ -6,6 +6,13 @@ body {
     margin: 0 auto;
     padding: 0;
     cursor: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTkuOTM3IDQuMzU4QTIgMiAwIDAgMSAxMiA0VjJBNCuMDI1IDQuMDI1IDAgMCAwIDkuMzM0IDEuNjcyTDkuMzM3IDRaIiBmaWxsPSIjMDAwIi8+CjxwYXRoIGQ9Ik05LjMzNyA0LjM1OEwyIDEuNjcyTDQuMzU4IDkuMzM3IDEyIDRWMloiIGZpbGw9IiMwMDAiLz4KPHBhdGggZD0iTTkuOTM3IDQuMzU4QTIgMiAwIDAgMSAxMiA0VjJBNC4wMjUgNC4wMjUgMCAwIDAgOS4zMzQgMS42NzJMOS4zMzcgNFoiIGZpbGw9IiMwMDAiLz4KPC9zdmc+Cg==') 12 12, auto;
+    background: #000;
+}
+
+/* Prevent flash of unstyled content on homepage */
+#projectsContainer:empty {
+    min-height: 100vh;
+    background: #000;
 }
 
 h1 {

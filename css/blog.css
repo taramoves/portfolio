@@ -2,11 +2,19 @@
   max-width: 800px;
   margin: 0 auto;
   padding: 24px;
+  background: #fff;
+  min-height: 100vh;
 }
 
 /* Ensure blog pages clear the fixed header height */
 main.blog-container {
   margin-top: 80px;
+}
+
+/* Blog pages should have white background and black text */
+body.has-header {
+  background: #fff;
+  color: #333;
 }
 
 .blog-list-item {
