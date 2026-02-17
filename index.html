@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Portfolio</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/grid.css">
+    <link rel="stylesheet" href="css/list.css">
+    <link rel="stylesheet" href="css/about.css">
+    <link rel="stylesheet" href="css/enhanced-modal.css">
+    <link rel="stylesheet" href="css/homepage.css">
+    <link rel="stylesheet" href="css/lightbox.css">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <!-- Three.js for interactive background -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+    <header class="main-header">
+        <h1>taramoves</h1>
+        <nav class="main-nav">
+            <ul>
+                <li><a href="#home" data-filter="home" class="nav-home">home</a></li>
+                <li><a href="#portfolio" data-filter="portfolio">art</a></li>
+                <li><a href="#work" data-filter="work">work</a></li>
+                <li><a href="#about" data-filter="about">about</a></li>
+                <li><a href="./everythingunderthedome/" data-bypass>blog</a></li>
+            </ul>
+        </nav>
+
+    </header>
+    <main>
+        <div class="homepage" id="projectsContainer">
+            <div class="hero-section">
+                <div class="hero-video-background">
+                    <iframe 
+                        src="https://www.youtube.com/embed/VMQPWjRT9U4?autoplay=1&mute=1&controls=0&loop=1&playlist=VMQPWjRT9U4&modestbranding=1&playsinline=1&rel=0&showinfo=0" 
+                        frameborder="0" 
+                        allow="autoplay; encrypted-media" 
+                        allowfullscreen>
+                    </iframe>
+                </div>
+                <div class="hero-content">
+                    <div class="hero-actions">
+                        <a href="#portfolio" class="cta-button primary">Portfolio</a>
+                        <a href="#about" class="cta-button secondary">About</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <footer class="site-footer">
+        <form id="subscribe-form" class="subscribe-form" novalidate>
+            <label for="subscribe-email">Join the email list</label>
+            <div class="subscribe-row">
+                <input type="email" id="subscribe-email" name="email" placeholder="you@example.com" required>
+                <button type="submit">Subscribe</button>
+            </div>
+            <p class="subscribe-message" id="subscribe-message" aria-live="polite"></p>
+        </form>
+    </footer>
+
+    <div id="projectModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <div class="modal-body">
+                <div class="modal-video"></div>
+                <div class="modal-info">
+                    <h2 class="modal-title"></h2>
+                    <div class="modal-subheading"></div>
+                    <p class="modal-description"></p>
+                    <div class="modal-link"></div>
+                    <div class="modal-tags"></div>
+                </div>
+                <img class="modal-image" src="" alt="">
+            </div>
+            <div class="modal-additional-images">
+                <!-- Additional images will be added here dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <script src="js/interactive-background.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/airtable-secure.js"></script>
+    <script src="js/render-projects-simple.js"></script>
+    <script src="js/enhanced-display.js"></script>
+    <script src="js/enhanced-filtering.js"></script>
+    <script src="js/search.js"></script>
+    <script src="js/homepage.js"></script>
+    <script src="js/about-data.js"></script>
+    <script src="js/about.js"></script>
+    <script src="js/grid.js"></script>
+    <script src="js/list.js"></script>
+    <script src="js/view-switcher.js"></script>
+    <script src="js/subscribe.js"></script>
+    <script src="js/lightbox.js"></script>
+</body>
+</html>

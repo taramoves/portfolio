@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/blog.css">
+</head>
+<body>
+    <header class="main-header">
+        <nav class="main-nav">
+            <ul>
+                <li><a href="./">← back to blog</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main class="blog-container">
+        <article id="blog-post">
+            <h1 id="post-title"></h1>
+            <div class="post-meta">
+                <time id="post-date"></time>
+                <div id="post-tags"></div>
+            </div>
+            <div id="post-content"></div>
+        </article>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="../js/blog.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        renderBlogPost();
+    });
+    </script>
+</body>
+</html>
