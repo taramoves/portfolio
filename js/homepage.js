@@ -264,6 +264,14 @@ function showPortfolio() {
     const container = document.getElementById('projectsContainer');
     container.className = 'projects-list';
     
+    // Check if projects are loaded
+    if (!window.projects || window.projects.length === 0) {
+        console.log('⚠️ Projects not loaded yet, waiting...');
+        container.innerHTML = '<p class="loading">Loading projects...</p>';
+        setTimeout(() => showPortfolio(), 500);
+        return;
+    }
+    
     // Filter by Portfolio tag AND Display field
     console.log('🔍 Total projects available:', (window.projects || []).length);
     const portfolioProjects = (window.projects || []).filter(project => {
